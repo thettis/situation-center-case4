@@ -34,7 +34,7 @@ definitions:
   # TODO — заполните
   IncidentEvent: 
     type: object
-    required: [incident_id, type, location, time, status]
+    required: [incident_id, type, location, time, status, deadline]
     properties:
       incident_id:
         type: string 
@@ -56,6 +56,10 @@ definitions:
         enum: [NEW,ASSIGNED,IN_PROGRESS,CLOSED]
       source:
         enum: [mobile,sensor,auto]
+      deadline:
+        type: string
+        format: date-time
+        description: Срок решения инцидента 
 
   # TODO — заполните
   AlertEvent:
