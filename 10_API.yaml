@@ -32,24 +32,34 @@ definitions:
         description: HMAC-SHA256 подпись события (защита от подмены)
 
   # TODO — заполните
-  IncidentEvent:
+  IncidentEvent: 
     type: object
-    required: [incident_id, type, location, time, status]
+    required: [incident_id, type, location, time, status, deadline]
     properties:
       incident_id:
-        ?   # подсказка: строка, pattern ^inc_[0-9]{3}$
+        type: string 
+        pattern: ^inc_[0-9]{3}$
+        description: Номер инцидента из 3-х значного числа.
       type:
-        ?   # подсказка: enum temperature / ventilation / humidity / equipment / other
+        enum: [temperature, ventilation, humidity,equipment,other]
       location:
-        ?   # подсказка: строка, pattern ^site_[0-9]{2}$
+        type: string 
+        pattern: ^site_[0-9]{2}$
+        description: проверяется, что участок есть в sites.csv
       time:
-        ?   # подсказка: string, format date-time
+        type: string 
+        format: date-time
       responsible:
-        ?   # подсказка: строка, nullable
+        type: [string, nullable]
+        description: номер ответственного или "nullable", если он пока не назначен
       status:
-        ?   # подсказка: enum NEW / ASSIGNED / IN_PROGRESS / CLOSED
+        enum: [NEW,ASSIGNED,IN_PROGRESS,CLOSED]
       source:
-        ?   # подсказка: enum mobile / sensor / auto
+        enum: [mobile,sensor,auto]
+      deadline:
+        type: string
+        format: date-time
+        description: Срок решения инцидента 
 
   # TODO — заполните
   AlertEvent:
@@ -57,29 +67,43 @@ definitions:
     required: [alert_id, severity, at]
     properties:
       alert_id:
-        ?   # подсказка: строка, pattern ^alrt_[0-9]{4}$
+        type: string 
+        pattern ^alrt_[0-9]{4}$
       measurement_id:
-        ?   # подсказка: FK на Measurement
+        type: string
+        description: FK на Measurement
       severity:
-        ?   # подсказка: enum WARNING / CRITICAL / STALE
+        enum: [WARNING,CRITICAL, STALE]
       action:
-        ?   # подсказка: enum ALERT_CREATED / ESCALATED / DUPLICATE
+        enum: [ALERT_CREATED,ESCALATED,DUPLICATE]
+        description: что система делает с алертом
       at:
-        ?   # подсказка: string, format date-time
+        type: string 
+        format: date-time
 
   # TODO — заполните
-  TransitionRequest:
+  TransitionRequest: #запрос на смену статуса
     type: object
     required: [incident_id, to, actor]
     properties:
       incident_id:
-        ?   # подсказка: строка
+        type: string 
+        pattern: ^inc_[0-9]{3}$
       to:
-        ?   # подсказка: enum ASSIGNED / IN_PROGRESS / CLOSED
+        enum: [ASSIGNED, IN_PROGRESS, CLOSED]
+        description: NEW запрашивать нельзя, тк это начальный статус
       actor:
-        ?   # подсказка: строка (роль или user_id)
+        type: string 
+        description: кто просит перевести в статус - роль или user_id
       comment:
-        ?   # подсказка: строка, nullable
+        type: [string, nullable]
+        description: Комментарий. Не обязателен
+      responsible: 
+        type: [string, nullable]
+        description: Ответственный. Нужен при переходе в ASSIGNED
+      resolution_reason:
+        enum: [RESOLVED, NO_ACTION, nullable]
+        description: Причина закрытия. NO_ACTION — ложный вызов (разрешает ASSIGNED → CLOSED)
 
   # TODO — заполните
   Error:
@@ -87,13 +111,16 @@ definitions:
     required: [error_code, message]
     properties:
       error_code:
-        ?   # подсказка: enum VALIDATION_ERROR / UNKNOWN_LOCATION / INVALID_TRANSITION / DUPLICATE_EVENT / SENSOR_SIGNATURE_INVALID
+        enum: [VALIDATION_ERROR,UNKNOWN_LOCATION,INVALID_TRANSITION,DUPLICATE_EVENT,SENSOR_SIGNATURE_INVALID]
       message:
-        ?   # подсказка: строка
+        type: string
+        description: сообщение для читающего ошибку
       retryable:
-        ?   # подсказка: boolean
+        type: boolean
+        description: description: Можно ли повторить запрос без изменений? (true — временный сбой, false — исправьте данные)
       details:
-        ?   # подсказка: object
+        type: object
+        description: детали ошибки (location)
 
 examples:
 
