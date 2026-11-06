@@ -257,6 +257,14 @@ def main():
     #проверить переходы на incidents.csv
     with open(incidents_path, encoding="utf-8") as f:
         incs = list(csv.DictReader(f))
+    # --- ВАЛИДАЦИЯ ИНЦИДЕНТОВ (T4-3) ---
+    inc_errors = 0
+    for inc in incs:
+        if inc["location"] not in sites:
+            print(f"❌ Инцидент {inc['incident_id']}: {inc['location']} - UNKNOWN_LOCATION")
+            inc_errors += 1
+    if inc_errors == 0:
+        print("OK: все инциденты имеют валидный location")
 
     print(f"OK: indicators обработано: {len(rows)}")
     print(f"    алертов создано:       {alerts}")
