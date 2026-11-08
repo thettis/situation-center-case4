@@ -85,14 +85,18 @@ def calc_severity(value, norm_min, norm_max):
 
 SECRET_KEY = os.environ.get("SENSOR_SECRET", "test_prototype_key_123").encode() #сначала берем из переменной окружения, если нет — тестовый ключ
 def verify_signature(row):
-    """Проверяет, не подделал ли кто-то данные датчика."""
-    #сбоорка данных в одну строку
+    """
+    Проверяем HMAC-подпись датчика (защита от подмены).
+    в исходном CSV нет колонки signature поэтому ставим заглушку
+    """
+    #если в данных вдруг появится подпись, проверяем
+    if "signature" not in row or row["signature"] == "":
+        return True #данных для проверки нет, пропускаем
+    #если подпись есть, считаем её
     payload = f"{row['time']}|{row['location']}|{row['indicator']}|{row['value']}".encode()
-    #генерация подписи HMAC
     expected_sig = hmac.new(SECRET_KEY, payload, hashlib.sha256).hexdigest()
-    #в таблице CSV нет параметра signature, поэтому для теста имитируем успешную проверку, если данные валидны.
-    #по хорошему тут было бы return hmac.compare_digest(expected_sig, row["signature"])
-    return True #заглушка для прототипа
+    
+    return hmac.compare_digest(expected_sig, row["signature"])
 
 def check_indicator(row, sites, seen, critical_counts):
     """
@@ -207,8 +211,6 @@ def main():
     #удаление старых файлов перед запуском
     if os.path.exists(OUT_CSV):
         os.remove(OUT_CSV)
-    if os.path.exists(AUDIT_CSV):
-        os.remove(AUDIT_CSV)
     if os.path.exists(INCIDENTS_OUT_CSV):
         os.remove(INCIDENTS_OUT_CSV)
     
