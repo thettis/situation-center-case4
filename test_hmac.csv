@@ -1,0 +1,3 @@
+time,location,indicator,value,norm_min,norm_max,status,signature
+2025-11-03T10:00:00Z,site_01,temperature,25.0,20.0,26.0,NORMAL,acaedf2a9be1adabecff84e35dccbf9ce1278f2c66ac918efd5282a3bdbde494
+2025-11-03T10:05:00Z,site_02,humidity,100.0,40.0,70.0,CRITICAL,a4478965cffb8e745fdaff027c9dc8a56605f5aa06f6064da23299b6922181ce

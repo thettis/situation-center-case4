@@ -74,7 +74,7 @@ def calc_severity(value, norm_min, norm_max):
     lo, hi = float(norm_min), float(norm_max)
     if lo <= v <= hi:
         return "NORMAL"
-    # ОБРАЗЕЦ — расчёт отклонения
+    #расчёт отклонения
     if v > hi:
         dev_pct = (v - hi) / hi * 100
     else:
